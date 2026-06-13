@@ -10,3 +10,5 @@ NPM, Node.js and MongoDB are required
 ### To package the application execute
 
     npm pack
+
+Application runs on port 3000
