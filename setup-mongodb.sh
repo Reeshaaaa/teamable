@@ -15,9 +15,8 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Detect Ubuntu codename (Linux Mint exposes it as UBUNTU_CODENAME).
+# Detect Ubuntu codename
 if [ -f /etc/os-release ]; then
-    # shellcheck disable=SC1091
     . /etc/os-release
 fi
 
@@ -35,27 +34,27 @@ case "$UBUNTU_CODENAME" in
 esac
 
 echo ""
-echo "=== 1/4 Install MongoDB Community Edition (official mongodb-org packages) ==="
+echo "=== 1/4 Install MongoDB Community Edition ==="
 
-# Official docs recommend removing the conflicting Ubuntu mongodb package first.
+# Remove the conflicting Ubuntu mongodb package first.
 if dpkg -l mongodb 2>/dev/null | grep -q "^ii"; then
     echo "Removing conflicting mongodb package..."
     apt-get remove -y mongodb
 fi
 
-# Official docs step: install gnupg and curl.
+# Install gnupg and curl to import the MongoDB 8.0 public GPG key.
 apt-get update
 apt-get install -y gnupg curl
 
-# Official docs step: import the MongoDB 8.0 public GPG key.
+# Import the MongoDB 8.0 public GPG key.
 curl -fsSL https://pgp.mongodb.com/server-8.0.asc | \
     gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
 
-# Official docs step: add the official APT repository.
+# Add the official APT repository.
 echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/8.0 multiverse" \
     > /etc/apt/sources.list.d/mongodb-org-8.0.list
 
-# Official docs step: refresh package list and install mongodb-org.
+# Refresh package list and install mongodb-org.
 apt-get update
 
 if ! command -v mongod >/dev/null 2>&1; then
@@ -67,7 +66,7 @@ fi
 echo ""
 echo "=== 2/4 Start the mongod service ==="
 
-# Official docs step: start mongod and enable it on boot.
+# Start mongod and enable it on boot.
 systemctl daemon-reload
 systemctl enable mongod
 systemctl start mongod
@@ -88,7 +87,7 @@ done
 echo ""
 echo "=== 3/4 Prepare the database for the back-end ==="
 
-# Create company_db with a temporary write (MongoDB creates the database on first use).
+# Create company_db with a temporary write.
 mongosh --quiet <<EOF
 use ${DB_NAME}
 db.employees.updateOne(
@@ -107,7 +106,7 @@ echo "=== 4/4 Optional authentication for production ==="
 if [ "$ENABLE_AUTH" = "true" ]; then
     echo "Enabling authentication for user: ${DB_USER}"
 
-    # Create the user before enabling authorization in mongod.conf.
+    # Create the user before enabling authentication in mongod.conf.
     mongosh --quiet <<EOF
 use ${DB_NAME}
 const existingUser = db.getUser("${DB_USER}")
@@ -123,7 +122,7 @@ if (existingUser === null) {
 }
 EOF
 
-    # Enable authentication per official docs (security.authorization).
+    # Enable authentication (security.authorization).
     if ! grep -q "authorization: enabled" /etc/mongod.conf; then
         if grep -q "^security:" /etc/mongod.conf; then
             sed -i '/^security:/a\  authorization: enabled' /etc/mongod.conf
