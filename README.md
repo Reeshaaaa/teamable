@@ -1,35 +1,77 @@
-# teamable
-This is an application for managing employee profiles.
+# Teamable
 
-NPM, Node.js and MongoDB are required
+Teamable is a small full-stack application for managing employee profiles.
 
-### MongoDB setup
+## Requirements
 
-The back-end expects:
+This project is intended for Ubuntu systems. The setup script supports Ubuntu versions:
+
+- Ubuntu 20.04 (Focal)
+- Ubuntu 22.04 (Jammy)
+- Ubuntu 24.04 (Noble)
+
+You also need:
+
+- Node.js
+- npm
+- MongoDB
+
+## Installation
+
+1. Clone the repository.
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Configure MongoDB:
+
+   ```bash
+   sudo ./setup-mongodb.sh
+   ```
+
+The setup script installs MongoDB, starts the service, and creates the required database and collection for the application.
+
+## Running the application
+
+### Development mode
+
+This mode disables authentication and is intended for local testing or non-production environments:
+
+```bash
+DEV=true npm start
+```
+
+### Production mode
+
+For production, provide database credentials and run the application with authentication enabled:
+
+```bash
+sudo DB_USER=my_user DB_PASS=my_password ./setup-mongodb.sh
+DB_USER=my_user DB_PASS=my_password npm start
+```
+
+The application expects:
 
 - MongoDB on `127.0.0.1:27017`
 - database `company_db`
-- collection `employees` (created automatically on first write)
+- collection `employees`
 
-Use `setup-mongodb.sh` to install and configure MongoDB.
+## Testing
 
-    sudo ./setup-mongodb.sh
+Run the test suite with:
 
-Development without authentication (uses the `DEV` variable in `server.js`):
+```bash
+npm test
+```
 
-    DEV=true npm start
+## Packaging
 
-Production mode with authentication:
+To create a package archive:
 
-    sudo ENABLE_AUTH=true DB_USER=my_user DB_PASS=my_password ./setup-mongodb.sh
-    DB_USER=my_user DB_PASS=my_password npm start
+```bash
+npm pack
+```
 
-### To run the tests execute
-
-    npm run test
-
-### To package the application execute
-
-    npm pack
-
-Application runs on port 3000
+The application listens on port `3000`.
