@@ -1,2 +1,0 @@
-const profiles = []
-const profile = {}
