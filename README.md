@@ -10,6 +10,8 @@ This project is intended for Ubuntu systems. The setup script supports Ubuntu ve
 - Ubuntu 22.04 (Jammy)
 - Ubuntu 24.04 (Noble)
 
+In case you want to run the application on another system, you will have to download MongoDB manually.
+
 You also need:
 
 - Node.js
